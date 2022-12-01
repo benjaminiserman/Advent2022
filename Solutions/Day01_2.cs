@@ -24,6 +24,6 @@ internal static class Day01_2
 
 
 		Console.WriteLine(results[^1] + results[^2] + results[^3]);
-		Clipboard.SetText(result.ToString());
+		Clipboard.SetText(result.ToString()); // editors note, this is bad and wrong! but it was in my final solution
 	}
 }

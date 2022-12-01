@@ -3,10 +3,8 @@ using InputHandler;
 
 internal static class Day01_2_R1
 {
-	public static void Execute()
+	public static string Execute()
 	{
-		var result = 0;
-
 		var results = Program.GetAllInput()
 			.Replace("\r", string.Empty)
 			.Split("\n\n")
@@ -17,8 +15,8 @@ internal static class Day01_2_R1
 
 		results.Sort();
 
-		Console.WriteLine(results[^1] + results[^2] + results[^3]);
-		Clipboard.SetText(result.ToString());
+		var result = results[^3] + results[^2] + results[^1];
+		return result.ToString();
 	}
 }
 

@@ -8,8 +8,11 @@ public static class Program
 	[STAThread]
 	public static void Main()
 	{
-		Day02_1.Execute();
-		//Day02_2.Execute();
+		var result = Day02_1.Execute();
+		//var result = Day02_2.Execute();
+
+		Console.WriteLine(result);
+		Clipboard.SetText(result.ToString());
 	}
 
 	public static string InputFilePath => "input.txt";

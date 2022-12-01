@@ -3,14 +3,17 @@ using InputHandler;
 
 internal static class Template
 {
-	public static void Execute()
+	public static string Execute()
 	{
-		var input = Input.ListUntilWhiteSpace(s => s, Program.GetLineOfInput);
+		//var input = Input.ListUntilWhiteSpace(s => int.Parse(s), Program.GetLineOfInput);
+		var input = Program.GetAllInput()
+			.Replace("\r", string.Empty)
+			.Split("\n")
+			.Select(s => s)
+			.ToList();
+
 		var result = 0;
 
-		
-
-		Console.WriteLine(result);
-		Clipboard.SetText(result.ToString());
+		return result.ToString();
 	}
 }
