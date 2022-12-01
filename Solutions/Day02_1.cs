@@ -5,7 +5,11 @@ internal static class Day02_1
 {
 	public static void Execute()
 	{
-		var input = Input.ListUntilWhiteSpace(s => s, Program.GetLineOfInput);
+		var input = Program.GetAllInput()
+			.Replace("\r", string.Empty)
+			.Split("\n")
+			.Select(s => s)
+			.ToList();
 		var result = 0;
 
 		

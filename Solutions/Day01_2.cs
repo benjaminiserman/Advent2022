@@ -3,8 +3,8 @@ using InputHandler;
 
 internal static class Day01_2
 {
-    public static void Execute()
-    {
+	public static void Execute()
+	{
 		var result = 0;
 
 		List<int> results = new();

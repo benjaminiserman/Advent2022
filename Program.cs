@@ -29,5 +29,7 @@ public static class Program
 		}
 	}
 
+	public static string GetAllInput() => File.ReadAllText(InputFilePath);
+
 	public static void ReloadInput() => _lines = File.ReadAllLines(InputFilePath);
 }
