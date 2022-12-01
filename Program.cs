@@ -5,9 +5,29 @@ using Advent2022.Solutions;
 
 public static class Program
 {
+	[STAThread]
 	public static void Main()
 	{
 		Day01_1.Execute();
 		//Day01_2.Execute();
 	}
+
+	public static string InputFilePath => "input.txt";
+
+	private static string[] _lines = null;
+	private static int _nextLine = 0;
+	public static string GetLineOfInput()
+	{
+		_lines ??= File.ReadAllLines(InputFilePath);
+		if (_nextLine < _lines.Length)
+		{
+			return _lines[_nextLine++];
+		}
+		else
+		{
+			return string.Empty;
+		}
+	}
+
+	public static void ReloadInput() => _lines = File.ReadAllLines(InputFilePath);
 }

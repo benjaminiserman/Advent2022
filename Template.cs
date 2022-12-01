@@ -1,16 +1,16 @@
-﻿namespace Advent2022;
+﻿namespace Advent2022.Solutions;
 using InputHandler;
 
 internal static class Template
 {
 	public static void Execute()
 	{
-		Console.WriteLine("Enter input:");
-		var input = Input.ListUntilWhiteSpace(s => s);
+		var input = Input.ListUntilWhiteSpace(s => s, Program.GetLineOfInput);
 		var result = 0;
 
 		
 
 		Console.WriteLine(result);
+		Clipboard.SetText(result.ToString());
 	}
 }
