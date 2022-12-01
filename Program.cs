@@ -8,8 +8,8 @@ public static class Program
 	[STAThread]
 	public static void Main()
 	{
-		Day01_1.Execute();
-		//Day01_2.Execute();
+		Day02_1.Execute();
+		//Day02_2.Execute();
 	}
 
 	public static string InputFilePath => "input.txt";
