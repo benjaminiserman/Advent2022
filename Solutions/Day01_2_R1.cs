@@ -1,5 +1,4 @@
 ﻿namespace Advent2022.Solutions;
-using InputHandler;
 
 internal static class Day01_2_R1
 {
