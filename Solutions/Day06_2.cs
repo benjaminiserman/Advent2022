@@ -1,18 +1,25 @@
 ﻿namespace Advent2022.Solutions;
-using InputHandler;
 
 internal static class Day06_2
 {
 	public static string Execute()
 	{
-		//var input = Input.ListUntilWhiteSpace(s => int.Parse(s), Program.GetLineOfInput);
-		var input = Program.GetAllInput()
-			.Replace("\r", string.Empty)
-			.Split("\n")
-			.Select(s => s)
-			.ToList();
-
 		var result = 0;
+		var input = Program.GetAllInput();
+		for (int i = 13; i < input.Length; i++)
+		{
+			var set = new HashSet<char>();
+			for (int j = 0; j < 14; j++)
+			{
+				set.Add(input[i - j]);
+			}
+
+			if (set.Count == 14)
+			{
+				result = i + 1;
+				break;
+			}
+		}
 
 		return result.ToString();
 	}
