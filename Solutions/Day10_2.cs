@@ -1,7 +1,7 @@
 ﻿namespace Advent2022.Solutions;
 using InputHandler;
 
-internal static class Template
+internal static class Day10_2
 {
 	public static string Execute()
 	{
