@@ -8,8 +8,8 @@ public static class Program
 	[STAThread]
 	public static void Main()
 	{
-		var result = Day14_1.Execute();
-		//var result = Day14_2.Execute();
+		var result = Day15_1.Execute();
+		//var result = Day15_2.Execute();
 
 		Console.WriteLine(result);
 		Clipboard.SetText(result.ToString());
