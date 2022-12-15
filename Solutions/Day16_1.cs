@@ -2,7 +2,7 @@
 using InputHandler;
 using System.Text.RegularExpressions;
 
-internal static class Template
+internal static class Day16_1
 {
 	public static string Execute()
 	{
