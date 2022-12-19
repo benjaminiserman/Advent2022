@@ -3,7 +3,7 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-internal static class Day19_1
+internal static class Day19_1_Copy
 {
 	enum Resource
 	{
@@ -41,18 +41,6 @@ internal static class Day19_1
 	record Blueprint(int Id)
 	{
 		public Dictionary<Resource, Dictionary<Resource, int>> Robots { get; set; } = new();
-
-		public Dictionary<Resource, int> Maxes { get; set; } = new();
-
-		public void SetMaxes()
-		{
-			foreach (var robot in Robots)
-			{
-				Maxes.Add(robot.Key, Robots.Max(x => x.Value.SafeGet(robot.Key)));
-			}
-
-			Maxes[Resource.Geode] = int.MaxValue;
-		}
 	}
 
 	record Node(Dictionary<Resource, int> Robots, Dictionary<Resource, int> Resources, Resource? NextRobot, int Time);
@@ -94,7 +82,6 @@ internal static class Day19_1
 				{ Resource.Obsidian, int.Parse(match.Groups[7].Value) },
 			});
 
-			blueprint.SetMaxes();
 			blueprints.Add(blueprint);
 		}
 
@@ -145,7 +132,7 @@ internal static class Day19_1
 				{
 					foreach (var robot in blueprint.Robots)
 					{
-						if (robot.Value.All(r => node.Resources.SafeGet(r.Key) >= r.Value) && node.Robots.SafeGet(robot.Key) < blueprint.Maxes[robot.Key])
+						if (robot.Value.All(r => node.Resources.SafeGet(r.Key) >= r.Value))
 						{
 							var resourcesAfterPurchase = new Dictionary<Resource, int>(resources);
 							foreach (var kvp in blueprint.Robots[robot.Key])
