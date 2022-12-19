@@ -95,7 +95,7 @@ internal static class Day19_1
 			int max = 0;
 			int Heuristic(Node node) =>
 				- node.Robots.SafeGet(Resource.Obsidian) * 3
-				- node.Robots.SafeGet(Resource.Geode) * 10;
+				- node.Robots.SafeGet(Resource.Geode) * 10 * node.Time;
 			Dictionary<Resource, int> IncreaseResources(Node node)
 			{
 				var resources = new Dictionary<Resource, int>(node.Resources);
@@ -114,7 +114,7 @@ internal static class Day19_1
 					throw new("bad");
 				}
 
-				if (node.Robots.SafeGet(Resource.Geode) * node.Time + node.Time * node.Time / 2 + node.Resources.SafeGet(Resource.Geode) < max)
+				if (node.Robots.SafeGet(Resource.Geode) * (node.Time - 1) + (node.Time - 1) * (node.Time - 1) / 2 + node.Resources.SafeGet(Resource.Geode) < max)
 				{
 					//Console.WriteLine("not happening");
 					return;
@@ -164,7 +164,7 @@ internal static class Day19_1
 					break;
 				}
 
-				if (watch.Elapsed > TimeSpan.FromMinutes(5))
+				if (watch.Elapsed > TimeSpan.FromMinutes(10))
 				{
 					Console.WriteLine("Time limit reached.");
 					break;
@@ -177,11 +177,12 @@ internal static class Day19_1
 						solves.Add(blueprint, new());
 					}
 
-					solves[blueprint].SafeSet(node, node.Resources.SafeGet(Resource.Geode));
-					if (solves[blueprint][node] > max)
+					var amt = node.Resources.SafeGet(Resource.Geode);
+					if (amt > max)
 					{
-						max = solves[blueprint][node];
-						Console.WriteLine($"new max: {max}");
+						solves[blueprint].SafeSet(node, amt);
+						max = amt;
+						Console.WriteLine($"new max: {max} @ {watch.Elapsed}");
 					}
 				}
 				else
