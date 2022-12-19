@@ -98,7 +98,8 @@ internal static class Day19_1
 			blueprints.Add(blueprint);
 		}
 
-		var solves = new Dictionary<Blueprint, Dictionary<Node, int>>();
+		//var solves = new Dictionary<Blueprint, Dictionary<Node, int>>();
+		var maxes = new Dictionary<Blueprint, int>();
 		foreach (var blueprint in blueprints)
 		{
 			Console.WriteLine($"blueprint {blueprint.Id}");
@@ -109,16 +110,6 @@ internal static class Day19_1
 			int Heuristic(Node node) =>
 				- node.Robots.SafeGet(Resource.Obsidian) * 3
 				- node.Robots.SafeGet(Resource.Geode) * 10 * node.Time;
-			Dictionary<Resource, int> IncreaseResources(Node node)
-			{
-				var resources = new Dictionary<Resource, int>(node.Resources);
-				foreach (var kvp in node.Robots)
-				{
-					resources.SafeSet(kvp.Key, resources.SafeGet(kvp.Key) + kvp.Value);
-				}
-
-				return resources;
-			}
 
 			void QueuePurchases(Node node, Blueprint blueprint)
 			{
@@ -127,37 +118,39 @@ internal static class Day19_1
 					throw new("bad");
 				}
 
-				if (node.Robots.SafeGet(Resource.Geode) * (node.Time - 1) + (node.Time - 1) * (node.Time - 1) / 2 + node.Resources.SafeGet(Resource.Geode) < max)
+				if (node.Robots.SafeGet(Resource.Geode) * node.Time + node.Time * node.Time / 2 + node.Resources.SafeGet(Resource.Geode) < max)
 				{
 					//Console.WriteLine("not happening");
 					return;
 				}
 
-				var resources = IncreaseResources(node);
-				queue.Enqueue(node with
-				{
-					NextRobot = null,
-					Resources = resources,
-					Time = node.Time - 1
-				}, Heuristic(node));
-
 				if (node.Time > 1)
 				{
-					foreach (var robot in blueprint.Robots)
+					foreach (var robotBlueprint in blueprint.Robots)
 					{
-						if (robot.Value.All(r => node.Resources.SafeGet(r.Key) >= r.Value) && node.Robots.SafeGet(robot.Key) < blueprint.Maxes[robot.Key])
+						if (robotBlueprint.Value
+								.All(r => r.Value == 0 || node.Robots.SafeGet(r.Key) >= 1) 
+							&& node.Robots.SafeGet(robotBlueprint.Key) < blueprint.Maxes[robotBlueprint.Key])
 						{
-							var resourcesAfterPurchase = new Dictionary<Resource, int>(resources);
-							foreach (var kvp in blueprint.Robots[robot.Key])
+							var timeElapsed = (int)Math.Ceiling(robotBlueprint.Value
+								.Max(resource => (double)(resource.Value - node.Resources.SafeGet(resource.Key)) / node.Robots.SafeGet(resource.Key))) + 1;
+
+							if (node.Time - timeElapsed < 0)
 							{
-								resourcesAfterPurchase.SafeSet(kvp.Key, resourcesAfterPurchase.SafeGet(kvp.Key) - kvp.Value);
+								continue;
+							}
+
+							var resources = new Dictionary<Resource, int>(node.Resources);
+							foreach (var kvp in node.Resources)
+							{
+								resources.SafeSet(kvp.Key, kvp.Value + node.Robots.SafeGet(kvp.Key) * timeElapsed -robotBlueprint.Value.SafeGet(kvp.Key));
 							}
 
 							queue.Enqueue(node with
 							{
-								NextRobot = robot.Key,
-								Resources = resourcesAfterPurchase,
-								Time = node.Time - 1,
+								NextRobot = robotBlueprint.Key,
+								Resources = resources,
+								Time = node.Time - timeElapsed,
 							}, Heuristic(node));
 						}
 					}
@@ -183,22 +176,16 @@ internal static class Day19_1
 					break;
 				}
 
-				if (node.Time == 0)
+				var amt = node.Resources.SafeGet(Resource.Geode) + node.Robots.SafeGet(Resource.Geode) * node.Time;
+				if (amt > max)
 				{
-					if (!solves.ContainsKey(blueprint))
-					{
-						solves.Add(blueprint, new());
-					}
-
-					var amt = node.Resources.SafeGet(Resource.Geode);
-					if (amt > max)
-					{
-						solves[blueprint].SafeSet(node, amt);
-						max = amt;
-						Console.WriteLine($"new max: {max} @ {watch.Elapsed}");
-					}
+					maxes.SafeSet(blueprint, amt);
+					max = amt;
+					//Console.WriteLine($"{node.Time} -> {node.Robots.SafeGet(Resource.Geode)} rbs and {node.Resources.SafeGet(Resource.Geode)} geodes");
+					Console.WriteLine($"new max: {max} @ {watch.Elapsed}");
 				}
-				else
+
+				if (node.Time > 0)
 				{
 					var robots = new Dictionary<Resource, int>(node.Robots);
 					if (node.NextRobot is Resource nextRobot)
@@ -211,6 +198,7 @@ internal static class Day19_1
 					}
 					else
 					{
+						throw new("bad2");
 						QueuePurchases(node, blueprint);
 					}
 				}
@@ -226,7 +214,8 @@ internal static class Day19_1
 		//	}
 		//}
 
-		result = solves.Sum(x => x.Key.Id * x.Value.Max(y => y.Value));
+		//result = solves.Sum(x => x.Key.Id * x.Value.Max(y => y.Value));
+		result = maxes.Sum(x => x.Key.Id * x.Value);
 		return result.ToString();
 	}
 }
