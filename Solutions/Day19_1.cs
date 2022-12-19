@@ -55,7 +55,7 @@ internal static class Day19_1
 		}
 	}
 
-	record Node(Dictionary<Resource, int> Robots, Dictionary<Resource, int> Resources, Resource? NextRobot, int Time);
+	record Node(Dictionary<Resource, int> Robots, Dictionary<Resource, int> Resources, int Time, List<(Resource, int)> Actions);
 
 	public static string Execute()
 	{
@@ -98,7 +98,6 @@ internal static class Day19_1
 			blueprints.Add(blueprint);
 		}
 
-		//var solves = new Dictionary<Blueprint, Dictionary<Node, int>>();
 		var maxes = new Dictionary<Blueprint, int>();
 		foreach (var blueprint in blueprints)
 		{
@@ -120,7 +119,6 @@ internal static class Day19_1
 
 				if (node.Robots.SafeGet(Resource.Geode) * node.Time + node.Time * node.Time / 2 + node.Resources.SafeGet(Resource.Geode) < max)
 				{
-					//Console.WriteLine("not happening");
 					return;
 				}
 
@@ -132,8 +130,8 @@ internal static class Day19_1
 								.All(r => r.Value == 0 || node.Robots.SafeGet(r.Key) >= 1) 
 							&& node.Robots.SafeGet(robotBlueprint.Key) < blueprint.Maxes[robotBlueprint.Key])
 						{
-							var timeElapsed = (int)Math.Ceiling(robotBlueprint.Value
-								.Max(resource => (double)(resource.Value - node.Resources.SafeGet(resource.Key)) / node.Robots.SafeGet(resource.Key))) + 1;
+							var timeElapsed = Math.Max(1, (int)Math.Ceiling(robotBlueprint.Value
+								.Max(resource => (double)(resource.Value - node.Resources.SafeGet(resource.Key)) / node.Robots.SafeGet(resource.Key))) + 1);
 
 							if (node.Time - timeElapsed < 0)
 							{
@@ -143,14 +141,18 @@ internal static class Day19_1
 							var resources = new Dictionary<Resource, int>(node.Resources);
 							foreach (var kvp in node.Resources)
 							{
-								resources.SafeSet(kvp.Key, kvp.Value + node.Robots.SafeGet(kvp.Key) * timeElapsed -robotBlueprint.Value.SafeGet(kvp.Key));
+								resources.SafeSet(kvp.Key, kvp.Value + node.Robots.SafeGet(kvp.Key) * timeElapsed - robotBlueprint.Value.SafeGet(kvp.Key));
 							}
+
+							var robots = new Dictionary<Resource, int>(node.Robots);
+							robots.SafeSet(robotBlueprint.Key, robots.SafeGet(robotBlueprint.Key) + 1);
 
 							queue.Enqueue(node with
 							{
-								NextRobot = robotBlueprint.Key,
+								Robots = robots,
 								Resources = resources,
 								Time = node.Time - timeElapsed,
+								Actions = new List<(Resource, int)>(node.Actions) { (robotBlueprint.Key, node.Time - timeElapsed) }
 							}, Heuristic(node));
 						}
 					}
@@ -160,7 +162,7 @@ internal static class Day19_1
 			QueuePurchases(new Node(Robots: new()
 			{
 				{ Resource.Ore, 1 }
-			}, Resources: new() { }, NextRobot: null, Time: 24), blueprint);
+			}, Resources: new() { }, Time: 24, new()), blueprint);
 			
 			while (queue.TryDequeue(out var node, out var priority))
 			{
@@ -181,40 +183,17 @@ internal static class Day19_1
 				{
 					maxes.SafeSet(blueprint, amt);
 					max = amt;
-					//Console.WriteLine($"{node.Time} -> {node.Robots.SafeGet(Resource.Geode)} rbs and {node.Resources.SafeGet(Resource.Geode)} geodes");
+					Console.WriteLine($"{node.Time} -> {node.Robots.SafeGet(Resource.Geode)} rbs and {node.Resources.SafeGet(Resource.Geode)} geodes");
 					Console.WriteLine($"new max: {max} @ {watch.Elapsed}");
 				}
 
 				if (node.Time > 0)
 				{
-					var robots = new Dictionary<Resource, int>(node.Robots);
-					if (node.NextRobot is Resource nextRobot)
-					{
-						robots.SafeSet(nextRobot, robots.SafeGet(nextRobot) + 1);
-						QueuePurchases(node with
-						{
-							Robots = robots
-						}, blueprint);
-					}
-					else
-					{
-						throw new("bad2");
-						QueuePurchases(node, blueprint);
-					}
+					QueuePurchases(node, blueprint);
 				}
 			}
 		}
 
-		//foreach (var blueprint in solves)
-		//{
-		//	Console.WriteLine($"Blueprint: {blueprint.Key.Id} ({blueprint.Value.Max(x => x.Value)}): ");
-		//	foreach (var solve in blueprint.Value)
-		//	{
-		//		Console.WriteLine($" - {solve.Value}");
-		//	}
-		//}
-
-		//result = solves.Sum(x => x.Key.Id * x.Value.Max(y => y.Value));
 		result = maxes.Sum(x => x.Key.Id * x.Value);
 		return result.ToString();
 	}
